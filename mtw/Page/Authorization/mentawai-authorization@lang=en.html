@@ -1,0 +1,1336 @@
+<!-- MWF Site -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+ 
+
+
+
+<html>
+<head>
+
+<title>Mentawai - Authorization</title>
+
+<style type="text/css" media="all">
+@import url("../../../Page.getCSS.mtw@file=main.css");
+</style>
+
+<meta http-equiv="imagetoolbar" content="no" />
+<meta http-equiv="imagetoolbar" content="false" />
+
+<link rel="shortcut icon" type="image/x-icon" href="../../../images/menta-ico.ico" />
+<link rel="icon" type="image/png" href="../../../images/menta-ico.png" />
+<link rel="stylesheet" href="../../../Page.getPrintCSS.mtw@file=print.css" type="text/css" media="print" />
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="author" content="Sergio Oliveira Junior" />
+<meta name="email" content="sergio.oliveira.jr@gmail.com" />
+
+<link href="../../../css/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="../../../jquery/jquery-1.6.4.min.js"></script>
+<script src="../../../js/jquery-ui-1.8.16.custom.min.js"></script>
+
+<link href="../../../uploadify/uploadify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="../../../uploadify/swfobject.js"></script>
+<script type="text/javascript" src="../../../uploadify/jquery.uploadify.v2.1.4.min.js"></script>
+
+<!-- Include required JS files -->
+<script type="text/javascript" src="../../../sh/js/shCore.js"></script>
+ 
+<!--
+    At least one brush, here we choose JS. You need to include a brush for every 
+    language you want to highlight
+-->
+<script type="text/javascript" src="../../../sh/js/shBrushJava.js"></script>
+<script type="text/javascript" src="../../../sh/js/shBrushXml.js"></script>
+<script type="text/javascript" src="../../../sh/js/shBrushRuby.js"></script>
+ 
+<!-- Include *at least* the core style and default theme -->
+<link href="../../../sh/css/shCore.css" rel="stylesheet" type="text/css" />
+<link href="../../../sh/css/shThemeDefault.css" rel="stylesheet" type="text/css" />
+ 
+<!-- Finally, to actually run the highlighter, you need to include this JS on your page -->
+<script type="text/javascript">
+     SyntaxHighlighter.all();
+</script>
+
+<!--  User JavaScript -->
+<script type="text/javascript">
+
+function myJavaScriptFunction {
+
+   // put something here!!!!
+
+}
+
+
+</script>
+
+
+<script language="JavaScript">
+    
+        $(document).ready(function() {
+        
+        	
+
+            
+			
+			
+
+            
+
+			$('#loginDialog').keyup(function(e) {
+    			if (e.keyCode == 13) {
+        			$('#loginForm').submit();
+    			}
+			});
+			
+			$('#file_upload').uploadify({
+				'uploader'  : '/uploadify/uploadify.swf',
+				'script'    : '/File.upload.mtw;jsessionid=46FD5748476EB0CC5AD98EFF3AE50BE7',
+				'cancelImg' : '/uploadify/cancel.png',
+				'folder'    : '/uploads',
+				'scriptData': { 'JSESSIONID': '46FD5748476EB0CC5AD98EFF3AE50BE7'},
+				'auto'      : true,
+				'multi'     : true,
+				'onComplete'  : function(event, ID, fileObj, response, data) {
+
+					var resp = eval('(' + response + ')');
+		
+					if (resp.status == 'success') {
+						$('#uploadResults').append('<tr><td style="color: blue;">' + resp.msg + '</td></tr>');
+					} else if (resp.status == 'error') {
+						$('#uploadResults').append('<tr><td style="color: red;">' + resp.msg + '</td></tr>');    				
+					}
+				}
+			});
+
+            // ajax add new user:
+
+	        
+            $('#usernameLoading').hide();
+    
+            $('#addNewUserUsername').blur( function() {
+    
+                $('#usernameMessage').hide();
+    
+                if ($('#addNewUserUsername').val().trim() != '') {
+
+                    $('#usernameLoading').show();
+    
+                    $.post("/User.check.mtw", {
+                        username : $('#addNewUserUsername').val()
+                    }, function(response) {
+                        $('#usernameMessage').fadeOut();
+                        setTimeout("usernameResult('"
+                                + escape(response) + "')", 400);
+                    });
+                }
+    
+                return false;
+            });
+
+        });
+        
+        function prepareEditPageDialog(myDialog, theTitle) {
+
+            options = {
+                autoOpen: false,
+                width: 1000,
+                modal: true,
+                title: theTitle,
+                buttons: [
+                          {
+                                text: "Save",
+                                click: function() { $('#editPageForm').submit(); }
+                          },
+                          {
+                                text: "Preview",
+                                click: function() { $('#editPagePreview').val('true'); $('#editPageForm').submit(); }
+                          },                          
+                          {
+                                text: "Cancel",
+                                click: function() { $(this).dialog("close"); }
+                          }
+                      ]
+           };
+
+          myDialog.dialog(options);
+
+          return myDialog;
+        }
+
+        function prepareShowPageDialog(myDialog, theTitle) {
+
+            options = {
+                autoOpen: false,
+                width: 800,
+                modal: true,
+                title: theTitle,
+                buttons: [
+                          {
+                                text: "Back",
+                                click: function() { $(this).dialog("close"); }
+                          },
+                          {
+                                text: "Close",
+                                click: function() { $(this).dialog("close"); $('#listLastRevisionsDialog').dialog('close'); $('#listRevisionsDialog').dialog('close'); $('#listAllPagesDialog').dialog('close'); }
+                          }
+                      ]
+           };
+
+          myDialog.dialog(options);
+
+          return myDialog;
+        }
+        
+		function prepareFileListDialog(myDialog) {
+
+            options = {
+                autoOpen: false,
+                width: 400,
+                height: 300,
+                modal: true,
+                title: "Files uploaded:",
+                buttons: [
+                          {
+                                text: "Close",
+                                click: function() { $(this).dialog("close"); }
+                          }
+                      ]
+           };
+
+          myDialog.dialog(options);
+
+          return myDialog;
+        }        
+                
+
+        function prepareListAllPagesDialog(myDialog, showEdit) {
+
+            listAllPagesButtons = [
+                      {
+                            text: "Close",
+                            click: function() { $(this).dialog("close"); }
+                      }];
+
+            if (showEdit) {
+                listAllPagesButtons = [
+                          {
+                                text: "FrontPage",
+                                click: function() { $('#listAllPagesForm').attr('action', '/Page.setFrontPage.mtw'); $('#listAllPagesForm').submit(); }
+                          },
+                          {
+                                text: "Delete",
+                                click: function() { $('#listAllPagesForm').attr('action', '/Page.delete.mtw'); $('#listAllPagesForm').submit(); }
+                          },
+                          {
+                                text: "Close",
+                                click: function() { $(this).dialog("close"); }
+                          }];
+            }
+
+            options = {
+                autoOpen: false,
+                width: 800,
+                height: 450,
+                modal: true,
+                title: 'Pages:',
+                buttons: listAllPagesButtons
+           };
+
+          myDialog.dialog(options);
+
+          return myDialog;
+        }
+
+        function prepareListRevisionsDialog(myDialog, name, lang, showBackButton) {
+        
+        	theButtons = [
+                          {
+                                text: "Back",
+                                click: function() { $(this).dialog("close"); }
+                          },
+                          {
+                                text: "Close",
+                                click: function() { $(this).dialog("close"); $('#listAllPagesDialog').dialog('close'); }
+                          }
+                      ];
+                      
+			if (!showBackButton) {
+			
+        	theButtons = [
+                          {
+                                text: "Close",
+                                click: function() { $(this).dialog("close"); $('#listAllPagesDialog').dialog('close'); }
+                          }
+                      ];
+			}                      
+            
+
+            options = {
+                autoOpen: false,
+                width: 800,
+                height: 450,
+                modal: true,
+                title: 'Revisions for ' + name + ' in ' + lang,
+                buttons: theButtons
+           };
+
+          myDialog.dialog(options);
+
+          return myDialog;
+        }
+        
+        function prepareListLastRevisionsDialog(myDialog, language) {
+        
+        	theButtons = [
+                          {
+                                text: "Close",
+                                click: function() { $(this).dialog("close"); }
+                          }
+                      ];
+
+            options = {
+                autoOpen: false,
+                width: 800,
+                height: 450,
+                modal: true,
+                title: 'Latest revisions in ' + language,
+                buttons: theButtons
+           };
+
+          myDialog.dialog(options);
+
+          return myDialog;
+        }
+        
+        
+        function prepareFileUploadDialog(myDialog) {
+        
+            options = {
+                autoOpen: false,
+                width: 400,
+                height: 300,
+                modal: true,
+                title: 'Uploading files...',
+                buttons: [
+                          {
+                                text: "Close",
+                                click: function() { $(this).dialog("close"); }
+                          }
+                      ]
+           };
+
+          myDialog.dialog(options);
+
+          return myDialog;
+        }        
+        
+        function showEditPageDialog(pageName, lang) {
+
+            $.getJSON('/Page.get.mtw?name=' + pageName + '&lang=' + lang, function(data) {
+
+                if (data.page.systemPage) {
+                	$('.editPageTitleCell').hide();
+                } else {
+                	$('.editPageTitleCell').show();
+                	$('#editPageTitle').val(data.page.title);
+                }
+                
+                if (data.page.new) {
+                	$('#editPageCommentCell').hide();
+                } else {
+                	$('#editPageCommentCell').show();
+                	if (data.page.preview) {
+                		$('#editPageComment').val(data.page.comment);
+                	}
+                }
+                
+                $('#editPageTextArea').val(data.page.body);
+                $('#editPageName').val(data.page.name);
+                $('#editPageLang').val(data.page.lang);
+
+                myDialog = $('#editPageDialog');
+                myDialog = prepareEditPageDialog(myDialog, 'Editing <i><font color="darkblue">' + pageName + "</font></i> in <i>" + data.page.language.name + "<i>...");
+                myDialog.dialog('open');
+            });
+            
+            return false;
+        }
+        
+        function showFileListDialog() {
+
+            $.getJSON('/File.listFiles.mtw', function(data) {
+
+				$('#fileListTable').html('');
+            
+            	if (data.files.length == 0) {
+            		$('#fileListTable').html('<tr><td align="center">No files uploaded yet!</td></tr>');
+            	} else {
+            		$.each(data.files, function(i,file) {
+						$('#fileListTable').append('<tr><td>' + file + '</td></tr>');						            			
+            		});
+            	}
+
+                myDialog = $('#fileListDialog');
+                myDialog = prepareFileListDialog(myDialog);
+                myDialog.dialog('open');
+            });
+            
+            return false;
+        }        
+
+        function showShowPageDialog(pageName, lang, revision) {
+
+            $.getJSON('/Page.get.mtw?name=' + pageName + '&lang=' + lang + '&revision=' + revision, function(data) {
+            
+                if (data.page.systemPage) {
+                    $('.showPageTitleCell').hide();
+                } else {
+                    $('.showPageTitleCell').show();
+                    $('#showPageTitle').val(data.page.title);
+                }
+                $('#showPageTextArea').val(data.page.body);
+
+                theTitle = 'Showing <i><font color="darkblue">' + pageName + "</font></i> in <i>" + data.page.language.name + "<i>...";
+                if (revision > 0) {
+                    theTitle += ' (Revision #' + revision + ')';
+                }
+
+                myDialog = $('#showPageDialog');
+                myDialog = prepareShowPageDialog(myDialog, theTitle);
+                myDialog.dialog('open');
+            });
+            
+            return false;
+        }
+
+        
+        function showEditPreviewDialog(pageName, lang) {
+
+            $.getJSON('/Page.getPreview.mtw?name=' + pageName + '&lang=' + lang, function(data) {
+
+            	if (data.page.systemPage) {
+                	$('.editPageTitleCell').hide();
+                } else {
+                	$('.editPageTitleCell').show();
+                	$('#editPageTitle').val(data.page.title);
+                }
+                
+                if (data.page.new) {
+                	$('#editPageCommentCell').hide();
+                } else {
+                	$('#editPageCommentCell').show();
+                	if (data.page.preview) {
+                		$('#editPageComment').val(data.page.comment);
+                	}
+                }
+                
+                
+                $('#editPageTextArea').val(data.page.body);
+                $('#editPageName').val(data.page.name);
+                $('#editPageLang').val(data.page.lang);
+
+                myDialog = $('#editPageDialog');
+                myDialog = prepareEditPageDialog(myDialog, 'Editing <i><font color="darkblue">' + pageName + "</font></i> in <i>" + data.page.language.name + "<i>...");
+                myDialog.dialog('open');
+            });
+            
+            return false;
+        }
+        
+        
+       	function showEditPreviewNewPageDialog(pageName, lang) {
+
+            $.getJSON('/Page.getPreview.mtw?name=' + pageName + '&lang=' + lang, function(data) {
+            
+           		$('#createNewPageName').val(data.page.name);
+        		$('#createNewPageTitle').val(data.page.title);
+        		$('#createNewPageLanguage').val(data.page.languageId);
+        		$('#createNewPageTextArea').val(data.page.body);
+        		$('#createNewPageNameError').text('');
+        		$('#createNewPageTitleError').text('');
+        		$('#createNewPageLanguageError').text('');
+        		$('#createNewPageBodyError').text('');
+            
+				showCreateNewPageDialog();
+
+				$('#createPageLanguageCell').hide();
+            });
+            
+            return false;
+        }
+        
+        function showListAllPagesDialog(isAdmin) {
+
+            $.getJSON('/Page.list.mtw', function(data) {
+
+                tableData = '';
+                tableData += '<tr>';
+                if (isAdmin) tableData += '<th>&nbsp;</th>';
+                tableData += '<th>Name</th>';
+                tableData += '<th>Language</th>';
+                tableData += '<th>Created By</th>';
+                tableData += '<th>Modified By</th>';
+                tableData += '<th>&nbsp;</th>';
+                tableData += '<th>&nbsp;</th>';
+                tableData += '<th>&nbsp;</th>';
+                tableData += '</tr>';
+
+                $.each(data.pages, function(i,page) {
+                
+                	pageName = page.name;
+
+                    modifiedBy = '';
+                    if (page.modifiedById > 0) {
+                        modifiedBy = page.modifiedBy.username;
+                    }
+
+                    if (page.systemPage == true) {
+                        pageName = '*' + pageName;
+                    }
+
+                    if (page.frontPage == true) {
+                        pageName = '[' + pageName + ']';
+                    }
+                    
+                    modifiedOnTitle = '';
+                    if (page.formattedModifiedOn != null) {
+                    	modifiedOnTitle = ' title="' + page.formattedModifiedOn + '"';
+                    }
+                    
+                    createdOnTitle = '';
+                    if (page.formattedCreatedOn != null) {
+                    	createdOnTitle = ' title="' + page.formattedCreatedOn + '"';
+                    }
+                    
+                    radioCell = '&nbsp;';
+                    viewCell = '&nbsp;';
+                    if (page.CSS == false && page.systemPage == false) {
+                    	viewCell = '<a title="View Page" tabindex="-1" href="http://mentaframework.org/Page.mtw?name='&#32;+&#32;page.name&#32;+&#32;'&amp;lang='&#32;+&#32;page.lang&#32;+&#32;'"><img src="../../../images/preview.png" border="0" /></a> ';
+                    	if (page.frontPage == false) {
+                    		radioCell = '<input tabindex="-1" type="radio" name="pageId" id="pageId" value="' + page.id + '" />';
+                    	}
+                    }
+
+                    viewRevisionsCell = '<a title="View Revisions" class="revisionLink" tabindex="-1" href="mentawai-authorization@lang=en.html#" onclick="return showListRevisionsDialog(\'' + page.name + '\',\'' + page.lang + '\',\'' + page.language.name + '\', true);"><img src="../../../images/folder.png" height="24" height="20" border="0" /></a>';
+                    
+                    nameTitle = '';
+                    if (page.title != null && page.title != '') {
+                    	nameTitle = ' title="' + page.title + '"';
+                    }
+
+                    tableData += '<tr>';
+                    if (isAdmin) tableData += '<td>' + radioCell + '</td>';
+                    tableData += '<td' + nameTitle + '>' + pageName + '</td>';
+                    tableData += '<td align="center">' + page.language.name + '</td>';
+                    tableData += '<td align="center"' + createdOnTitle + '>' + page.createdBy.username + '</td>';
+                    tableData += '<td align="center"' + modifiedOnTitle + '>' + modifiedBy + '</td>';
+                    tableData += '<td align="center">' + viewCell + '</td>';
+                    tableData += '<td align="center"><a tabindex="-1" title="View Html" href="mentawai-authorization@lang=en.html#" onclick="return showShowPageDialog(\'' + page.name + '\',\'' + page.lang + '\', -1);"><img src="../../../images/view.png" border="0" /></a></td>';
+                    tableData += '<td align="center">' + viewRevisionsCell + '</td>';
+                    tableData += '</tr>';
+                });
+
+                $('#listAllPagesTable').html(tableData);
+
+                myDialogDiv = $('#listAllPagesDialog');
+                myDialog = prepareListAllPagesDialog(myDialogDiv, isAdmin);
+                myDialog.dialog('open');
+                $('.ui-dialog :button').blur();
+             });
+            
+            return false;
+        }
+
+        function showListRevisionsDialog(name, lang, language, showBackButton) {
+
+            $.getJSON('/Page.getRevisions.mtw?name=' + name + '&lang=' + lang, function(data) {
+
+                tableData = '';
+                tableData += '<tr>';
+                tableData += '<th>Revision</th>';
+                tableData += '<th>Author</th>';
+                tableData += '<th>Date</th>';
+                
+                if (data.isSystemPage == false) {
+                    tableData += '<th>&nbsp;</th>';
+                }
+                tableData += '<th>&nbsp;</th>';
+                tableData += '</tr>';
+
+                $.each(data.revisions, function(i,revision) {
+                
+                	titleForComment = '';
+                	if (revision.comment != null && revision.comment != '') {
+                		titleForComment = ' title="' + revision.comment + '"';
+                	}
+
+                    tableData += '<tr>';
+                    tableData += '<td' + titleForComment + '>' + revision.revision + '</td>';
+                    tableData += '<td align="center">' + revision.user.username + '</td>';
+                    tableData += '<td align="center">' + revision.formattedCreatedOn + '</td>';
+
+                    if (data.isSystemPage == false) {
+                        tableData += '<td align="center"><a title="View Page" tabindex="-1" href="../../../Page.mtw@name='&#32;+&#32;revision.name&#32;+&#32;'&amp;lang='&#32;+&#32;revision.lang&#32;+&#32;'&amp;revision='&#32;+&#32;revision.revision&#32;+'.html"><img src="../../../images/preview.png" border="0" /></a></td>';
+                    }
+                    
+                    tableData += '<td align="center"><a tabindex="-1" title="View Html" href="mentawai-authorization@lang=en.html#" onclick="return showShowPageDialog(\'' + revision.name + '\',\'' + revision.lang + '\',' + revision.revision + ');"><img src="../../../images/view.png" border="0" /></a></td>';
+
+                    tableData += '</tr>';
+                });
+
+                $('#listRevisionsTable').html(tableData);
+                myDialog = $('#listRevisionsDialog');
+                myDialog = prepareListRevisionsDialog(myDialog, name, language, showBackButton);
+                myDialog.dialog('open');
+                $('.ui-dialog :button').blur();
+             });
+            
+            return false;
+        }
+        
+        function showListLastRevisionsDialog(lang, language, isLogged) {
+
+            $.getJSON('/Page.getLastRevisions.mtw?lang=' + lang, function(data) {
+
+                tableData = '';
+                tableData += '<tr>';
+                tableData += '<th>Page</th>';
+                tableData += '<th>Revision</th>';
+                tableData += '<th>Author</th>';
+                tableData += '<th>Date</th>';
+                tableData += '<th>Comment</th>';
+                tableData += '<th>&nbsp;</th>';
+
+                if (isLogged) {
+                    tableData += '<th>&nbsp;</th>';
+                }
+                
+                tableData += '</tr>';
+
+                $.each(data.revisions, function(i,revision) {
+                
+                    tableData += '<tr>';
+                    
+                    pageName = revision.name;
+                    
+                    if (revision.frontPage) {
+                    	pageName = '[' + pageName + ']';
+                    } else if (revision.systemPage) {
+                    	pageName = '*' + pageName;
+                    }
+
+                    nameTitle = '';
+                    if (revision.title != null && revision.title != '') {
+                    	nameTitle = ' title="' + revision.title + '"';
+                    }
+                    
+                    tableData += '<td' + nameTitle + ' align="center">' + pageName + '</td>';
+                    tableData += '<td align="center">' + revision.revision + '</td>';
+                    tableData += '<td align="center">' + revision.user.username + '</td>';
+                    tableData += '<td align="center">' + revision.formattedCreatedOn + '</td>';
+                    tableData += '<td align="left">' + revision.comment + '</td>';
+
+					if (!revision.systemPage) {
+                    	tableData += '<td align="center"><a title="View Page" tabindex="-1" href="../../../Page.mtw@name='&#32;+&#32;revision.name&#32;+&#32;'&amp;lang='&#32;+&#32;revision.lang&#32;+&#32;'&amp;revision='&#32;+&#32;revision.revision&#32;+'.html"><img src="../../../images/preview.png" border="0" /></a></td>';
+                    } else {
+                    	tableData += '<td>&nbsp;</td>';
+                    }
+
+                    if (isLogged) {
+                        tableData += '<td align="center"><a tabindex="-1" title="View Html" href="mentawai-authorization@lang=en.html#" onclick="return showShowPageDialog(\'' + revision.name + '\',\'' + revision.lang + '\',' + revision.revision + ');"><img src="../../../images/view.png" border="0" /></a></td>';
+                    }
+                    
+                    tableData += '</tr>';
+                });
+
+                $('#listLastRevisionsTable').html(tableData);
+                myDialog = $('#listLastRevisionsDialog');
+                myDialog = prepareListLastRevisionsDialog(myDialog, language);
+                myDialog.dialog('open');
+                $('.ui-dialog :button').blur();
+             });
+            
+            return false;
+        }
+
+
+       	function showCreateNewPageDialog() {
+
+            $('#createNewPageFormName').val('Authorization');
+            $('#createNewPageFormLang').val('en');
+            $('#createPageLanguageCell').show();
+
+            myDialog = $('#createNewPageDialog');
+            myDialog = prepareCreateNewPageDialog(myDialog);
+            myDialog.dialog('open');
+            
+            return false;
+        }
+        
+        function prepareCreateNewPageDialog(myDialog) {
+
+            options = {
+            	close: function() { clearCreateNewPageForm(); },
+                autoOpen: false,
+                width: 800,
+                modal: true,
+                title: "Create New Page:",
+                buttons: [
+                          {
+                                text: "Create",
+                                click: function() { $('#createNewPageForm').submit(); }
+                          },
+                          {
+                              text: "Preview",
+                              click: function() { $('#createNewPageFormPreview').val('true'); $('#createNewPageForm').submit(); }
+                          },
+                          {
+                                text: "Cancel",
+                                click: function() {  $(this).dialog("close"); }
+                          }
+                      ]
+           };
+
+          myDialog.dialog(options);
+
+          return myDialog;
+        }
+        
+        function showFileUploadDialog() {
+  			
+  			$('#uploadResults').html('');
+        
+        	myDialog = $('#fileUploadDialog');
+        	myDialog = prepareFileUploadDialog(myDialog);
+        	myDialog.dialog('open');
+        }
+        
+    
+        function showLoginDialog() {
+
+            $('#loginFormName').val('Authorization');
+            $('#loginFormLang').val('en');
+
+            myDialog = $('#loginDialog');
+            myDialog = prepareLoginDialog(myDialog);
+            myDialog.dialog('open');
+
+            return false;
+        }
+
+        function showAddNewUserDialog(hideUsernameMessage) {
+
+            myDialog = $('#addNewUserDialog');
+            myDialog = prepareAddNewUserDialog(myDialog, hideUsernameMessage);
+            myDialog.dialog('open');
+
+            return false;
+        }
+        
+        function clearLoginForm() {
+        	$('#loginUsername').val('');
+        	$('#loginPassword').val('');
+        	$('#loginUsernameError').text('');
+        	$('#loginPasswordError').text('');
+        }
+
+        function clearAddNewUserForm() {
+        	$('#addNewUserUsername').val('');
+        	$('#addNewUserPassword').val('');
+        	$('#addNewUserPassconf').val('');
+        	$('#addNewUserGroup').val('');
+        	$('#usernameMessage').text('');
+        	$('#addNewUserPasswordError').text('');
+        	$('#addNewUserPassconfError').text('');
+        	$('#addNewUserGroupError').text('');
+        }
+        
+        function clearCreateNewPageForm() {
+        	$('#createNewPageName').val('');
+        	$('#createNewPageTitle').val('');
+        	$('#createNewPageLanguage').val('');
+        	$('#createNewPageTextArea').val('');
+        	$('#createNewPageNameError').text('');
+        	$('#createNewPageTitleError').text('');
+        	$('#createNewPageLanguageError').text('');
+        	$('#createNewPageBodyError').text('');
+        }
+        
+      	function prepareLoginDialog(myDialog) {
+
+            options = {
+            	close: function() { clearLoginForm(); },
+                autoOpen: false,
+                width: 290,
+                modal: true,
+                title: "Login:",
+                buttons: [
+                          {
+                                text: "Login",
+                                click: function() { $('#loginForm').submit(); }
+                          },
+                          {
+                                text: "Cancel",
+                                click: function() {  $(this).dialog("close"); }
+                          }
+                      ]
+           };
+
+          myDialog.dialog(options);
+
+          return myDialog;
+        }
+
+        function prepareAddNewUserDialog(myDialog, hideUsernameMessage) {
+
+        	$('#usernameLoading').hide();
+            if (hideUsernameMessage) $('#usernameMessage').text('');
+
+            options = {
+                close: function() { clearAddNewUserForm(); },
+                autoOpen: false,
+                width: 550,
+                modal: true,
+                title: "Add New User:",
+                buttons: [
+                          {
+                                text: "Add",
+                                click: function() { $('#addNewUserForm').submit(); }
+                          },
+                          {
+                                text: "Cancel",
+                                click: function() {  $(this).dialog("close"); }
+                          }
+                      ]
+           };
+
+          myDialog.dialog(options);
+
+          return myDialog;
+        }
+        
+      	function prepareConfirmDialog(myDialog) {
+
+            options = {
+                autoOpen: false,
+                width: 300,
+                modal: true,
+                title: "Confirmation:",
+                buttons: [
+                          {
+                                text: "Yes",
+                                click: function() { $(this).dialog("close"); }
+                          },
+                          {
+                                text: "No",
+                                click: function() {  $(this).dialog("close"); }
+                          }
+                      ]
+           };
+
+          myDialog.dialog(options);
+
+          return myDialog;
+        }
+        
+         function showConfirmDialog() {
+
+            myDialog = $('#confirmDialog');
+            myDialog = prepareConfirmDialog(myDialog);
+            myDialog.dialog('open');
+
+            return false;
+        }
+        
+        function usernameResult(response) {
+        
+                $('#usernameLoading').hide();
+        
+                var res = unescape(response);
+        
+                if (res == "error") {
+        
+                    $('#usernameMessage')
+                            .html(
+                                    '<font color="red"><b>Error!</b></font>');
+                    $('#usernameMessage').fadeIn();
+        
+                } else if (res == "success") {
+        
+                    $('#usernameMessage').html(
+                            '<img src="../../../images/chk.gif" />');
+                    $('#usernameMessage').fadeIn();
+        
+                } else if (res == "already") {
+        
+                    $('#usernameMessage')
+                            .html(
+                                    '<font color="red"><b>Username already exists!</b></font>');
+                    $('#usernameMessage').fadeIn();
+                }
+            }
+        </script>
+       	 	<!-- Google Analytics --> 
+		
+
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-3487700-4");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
+
+
+
+       
+
+</head>
+
+<body class="composite">
+
+<!--  For adding username -->
+<div id="addNewUserDialog" style="display: none;">
+        <form action="http://mentaframework.org/User.add.mtw" method="post" id="addNewUserForm">
+            <table>
+                <tr>
+                    <td width="10%">
+                        Username:
+                    </td>
+                    <td>
+                        <input type="text" name="username" size="20" maxlength="30" id="addNewUserUsername" />
+                        <span id="usernameLoading">
+                            <img src="../../../images/loading.gif" />
+                        </span>
+                        <span id="usernameMessage">
+                            
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Password:
+                    </td>
+                    <td>
+                        <input type="password" name="password" size="20" maxlength="20" id="addNewUserPassword" /> 
+                        <span id="addNewUserPasswordError">
+                            
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Confirm:
+                    </td>
+                    <td>
+                        <input type="password" name="passconf" size="20" maxlength="20" id="addNewUserPassconf" /> 
+                        <span id="addNewUserPassconfError">
+                            
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Group:
+                    </td>
+                    <td>
+                        <select name="groupId" id="addNewUserGroup">
+<option value=""> - </option>
+<option value="1">Admin</option>
+<option value="2">Editor</option>
+</select>
+
+                        <span id="addNewUserGroupError">
+                        
+                        </span>
+                    </td>
+                </tr>
+            </table>
+        </form>
+</div>
+
+<!-- For Testing -->
+<div id="dialog" title="Dialog Title" style="display: none;">I'm in a dialog</div>
+
+<!-- Close Confirm -->
+<div id="confirmDialog" style="display: none;">
+	<span id="confirmMessage">The confirmation message goes here.</span>
+</div>
+
+<!-- For file upload -->
+<div id="fileUploadDialog" style="display: none;">
+<br/>
+<input id="file_upload" name="file_upload" type="file" />
+<table cellspacing="2" cellpadding="5" id="uploadResults" style="margin-top: 10px;">
+</table>
+</div>
+
+<!-- For files listing -->
+<div id="fileListDialog" style="display: none;">
+<table cellspacing="2" cellpadding="5" id="fileListTable" style="margin-top: 10px;">
+</table>
+</div>
+
+<!-- For Editing Pages -->
+<div id="editPageDialog" style="display: none;">
+<form id="editPageForm" action="http://mentaframework.org/Page.edit.mtw" method="post">
+<input type="hidden" name="name" id ="editPageName" value="" />
+<input type="hidden" name="lang" id="editPageLang" value="" />
+<input type="hidden" name="isPreview" id="editPagePreview" value="false" />
+<table border="0">
+    <tr>
+        <td>&nbsp;</td>
+    </tr>
+                <tr class="editPageTitleCell">
+                    <td>
+                        Title:&nbsp;&nbsp;&nbsp;&nbsp;
+                        <input type="text" name="title" size="40" maxlength="100" id="editPageTitle" value="mentawai-authorization" />
+                        <span id="editPageTitleError">
+                        
+                        </span>
+                    </td>
+                </tr>
+                <tr class="editPageTitleCell"><td colspan="2">&nbsp;</td></tr>
+    <tr>
+        <td><textarea name="body" style="width: 100%; height: 465px;" id="editPageTextArea"></textarea>
+        <span id="editPageTextAreaError">
+                        
+                        </span>
+        
+        </td>
+    </tr>
+    
+    <tr id="editPageCommentCell">
+                    <td width="20%">
+                        Edit comment: (<i>optional</i>) &nbsp;&nbsp;&nbsp;&nbsp;
+                        <input type="text" name="comment" size="40" maxlength="100" id="editPageComment" />
+                        <span id="editPageCommentError">
+                        
+                        </span>
+                    </td>
+                </tr>
+    
+</table>
+</form>
+</div>
+
+<!-- For Showing Page Html -->
+<div id="showPageDialog" style="display: none;">
+<form id="showPageForm">
+<table>
+    <tr>
+        <td>&nbsp;</td>
+    </tr>
+                <tr class="showPageTitleCell">
+                    <td>
+                        Title:
+                    </td>
+                    <td>
+                        <input type="text" name="title" size="40" maxlength="100" id="showPageTitle" value="mentawai-authorization" readonly="readonly" />
+                    </td>
+                </tr>
+                <tr class="showPageTitleCell"><td>&nbsp;</td></tr>
+    <tr>
+        <td colspan="2">
+        <textarea name="body" style="width: 100%; height: 465px;" id="showPageTextArea" readonly="readonly"></textarea>
+        </td>
+    </tr>
+</table>
+</form>
+</div>
+
+
+<!-- For Login -->
+<div id="loginDialog" style="display: none;">
+		<form action="http://mentaframework.org/Login.mtw" method="post" id="loginForm">
+            <input type="hidden" name="name" value="" id="loginFormName" />
+            <input type="hidden" name="lang" value="" id="loginFormLang" />
+			<table>
+				<tr>
+					<td>
+						Username:
+					</td>
+					<td>
+						<input type="text" name="username" size="20" maxlength="20" id="loginUsername" />
+						<span id="loginUsernameError">
+						
+						</span>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Password:
+					</td>
+					<td>
+						<input type="password" name="password" size="20" maxlength="20" id="loginPassword" />
+						<span id="loginPasswordError"> 
+						
+						</span>
+					</td>
+				</tr>
+			</table>
+		</form>
+</div>
+
+<!-- For displaying all pages -->
+<div id="listAllPagesDialog" style="display: none;">
+    <form action="mentawai-authorization@lang=en.html#" method="post" id="listAllPagesForm">
+    <table id="listAllPagesTable">
+    </table>
+    </form>
+</div>
+
+
+<!-- For displaying revisions -->
+<div id="listRevisionsDialog" style="display: none;">
+    <table class="revisionsTable" id="listRevisionsTable">
+    </table>
+</div>
+
+<!-- For displaying last revisions -->
+<div id="listLastRevisionsDialog" style="display: none;">
+    <table class="revisionsTable" id="listLastRevisionsTable">
+    </table>
+</div>
+
+
+<!-- Create New Page -->
+<div id="createNewPageDialog" style="display: none;">
+		<form action="http://mentaframework.org/Page.add.mtw" method="post" id="createNewPageForm">
+            <input type="hidden" name="name" value="" id="createNewPageFormName" />
+            <input type="hidden" name="lang" value="" id="createNewPageFormLang" />
+            <input type="hidden" name="isPreview" value="false" id="createNewPageFormPreview" />
+			<table>
+				<tr>
+					<td>
+						Name:
+					</td>
+					<td>
+						<input type="text" name="newPage.name" size="40" maxlength="30" id="createNewPageName" />
+						<span id="createNewPageNameError">
+						
+						</span>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Title:
+					</td>
+					<td>
+						<input type="text" name="newPage.title" size="40" maxlength="100" id="createNewPageTitle" />
+						<span id="createNewPageTitleError">
+						
+						</span>
+					</td>
+				</tr>
+				<tr id="createPageLanguageCell">
+					<td>
+						Language:
+					</td>
+					<td>
+						<select name="newPage.languageId" id="createNewPageLanguage">
+<option value=""> - </option>
+<option value="1">English</option>
+<option value="2">Portuguese</option>
+</select>
+
+						<span id="createNewPageLanguageError">
+						
+						</span>
+					</td>
+				</tr>
+				<tr>
+        			<td colspan="2">
+        				<textarea name="newPage.body" style="width: 100%; height: 465px;" id="createNewPageTextArea"></textarea>
+        				<span id="createNewPageBodyError">
+						
+						</span>
+        			</td>
+    			</tr>
+			</table>
+		</form>
+</div>
+
+
+<div>
+<table border="0">
+    <tr>
+        <td>
+
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../index.html"><img src="../../../uploads/images/mentawai-logo-new.png" border="0" /></a>        
+        
+        
+        </td>
+        <td align="right" valign="bottom">
+            
+                <!-- a href="#" onclick="return showListLastRevisionsDialog('en', 'English', false);">Last Updates</a> | -->
+                <a href="mentawai-authorization@lang=en.html#" onclick="return showLoginDialog();">Login</a>
+            
+            
+            &nbsp;
+            
+            <a href="mentawai-authorization@lang=en.html"><img src="../../../uploads/images/flag_usa.gif" border="0" width="20" height="13" style="border: 3px solid #ccc; " /></a>
+<a href="mentawai-authorization@lang=pt.html"><img src="../../../uploads/images/flag_brazil.gif" border="0" width="20" height="13" style="border: 3px solid #fff; " /></a>
+
+            &nbsp;&nbsp;&nbsp;
+        </td>
+    </tr>
+</table>
+</div>
+
+<hr />
+
+<div id="leftColumn">
+<div id="navcolumn">
+    <div>
+    <h3>General Information</h3>
+<ul>
+<li><a href="../Intro.html" class="large">Overview</a></li>
+<li><a href="../QuickStart.html" class="large">Quick Start</a></li>
+<li><a href="../Downloads.html" class="large">Downloads</a></li>
+<!-- li><a href="http://mentawai-forum.soliveirajr.com/forums/show/21.page" target="_blank" class="large">Discussion Forum</a></li -->
+<li><a href="../../../api/index.html" target="_blank" class="large">API Documentation</a></li>
+<li><a href="../Donations.html" class="large">Donations</a></li>
+</ul>
+
+<h3>Basics</h3>
+<ul>
+<li><a href="../Architecture.html" class="large">Big Picture</a></li>
+<li><a href="../InOut.html" class="large">Action Input and Output</a></li>
+<li><a href="../Contexts.html" class="large">Action Contexts</a></li>
+<li><a href="../Consequences.html" class="large">Action Consequences</a></li>
+<li><a href="../Filters.html" class="large">Filters</a></li>
+</ul>
+
+<h3>Features</h3>
+<ul>
+<li><a href="../Properties.html" class="large">Environment Properties</a></li>
+<li><a href="../Authentication.html" class="large">Authentication</a></li>
+<li><span class="largeClicked">Authorization</span></li>
+<li><a href="../Validation.html" class="large">Validation</a></li>
+<li><a href="../DynamicMessages.html" class="large">Dynamic Messages</a></li>
+<li><a href="../IoC.html" class="large">Inversion of Control</a></li>
+<li><a href="../I18N.html" class="large">Internationalization</a></li>
+<li><a href="../DataLists.html" class="large">Data Lists</a></li>
+<li><a href="../MentaTags.html" class="large">Menta Tags</a></li>
+<li><a href="../CustomTags.html" class="large">Custom Tags</a></li>
+<li><a href="../DB.html" class="large">DB Connection</a></li>
+<li><a href="../ORM.html" class="large">ORM and SQL builder</a></li>
+<li><a href="../Email.html" class="large">Sending Email</a></li>
+<li><a href="../FileUpload.html" class="large">File Upload</a></li>
+<li><a href="../Ajax.html" class="large">Ajax</a></li>
+<li><a href="../PrettyURL.html" class="large">Pretty URLs</a></li>
+</ul>
+
+<h3>Extra</h3>
+<ul>
+<li><a href="../RefApp.html" class="large">Reference Application</a></li>
+<li><a href="../DebugMode.html" class="large">Debug Mode</a></li>
+<li><a href="../Velocity.html" class="large">Velocity Integration</a></li>
+<li><a href="../JRuby.html" class="large">JRuby Integration</a></li>
+<li><a href="../Sticky.html" class="large">Stateful Actions</a></li>
+<li><a href="../PojoActions.html" class="large">Pojo Actions</a></li>
+<li><a href="../PaginatorTag.html" class="large">Paginator Tag</a></li>
+<li><a href="../Hibernate.html" class="large">Hibernate Integration</a></li>
+<li><a href="../JRebel.html" class="large">Jetty + JRebel + Maven</a></li>
+</ul>
+
+<h3>Links</h3>
+<ul>
+<li><a href="http://old.mentaframework.org" target="_blank" class="large">Old Site</a></li>
+<li><a href="http://forum.mentaframework.org" target="_blank" class="large">Old Forum</a></li>
+<li><a href="http://mentabean.soliveirajr.com" target="_blank" class="large">MentaBean</a></li>
+<li><a href="http://mentacontainer.soliveirajr.com" target="_blank" class="large">MentaContainer</a></li>
+<li><a href="http://kawai.soliveirajr.com" target="_blank" class="large">Kawai Wiki</a></li>
+</ul>
+
+<h3>About</h3>
+<ul>
+<li><a href="../Subversion.html" class="large">Subversion</a></li>
+<li><a href="../Team.html" class="large">Project Team</a></li>
+<li><a href="../Maven.html" class="large">Maven</a></li>
+<li><a href="http://www.gnu.org/copyleft/lesser.html" target="_blank" class="large">License (LGPL)</a></li>
+</ul>
+    </div>
+<br />
+</div>
+
+</div>
+
+<div id="bodyColumn">
+    
+    <h3>Authorization</h3>
+<ul>
+<p>Authorization comes into play after the user is authenticated and it usually means <i>Who can access what?</i>. Mentawai comes with a simple yet powerful approach to user authorization. In Mentawai you can tell the framework to which groups an authenticated user belongs so that later it can grant or deny access to parts of the web application based on that information. For example, you may have actions that must only be accessed by the ADMIN group. The same thing for some JSP pages. More interestingly, a JSP page may hide certain blocks or parts from certain user groups.</p>
+<p class="note">Telling the framework to which groups an user belongs:</p>
+<pre class="brush: java; highlight: [10]; noBR: true;">
+public class LoginAction extends BaseLoginAction {
+   
+   @Override
+   public String execute() {
+      
+      // (...)
+               
+      setSessionObj(u);
+         
+      setSessionGroups(u.getGroup());
+         
+      setSessionLocale(u.getLocale());
+         	
+      return SUCCESS;
+         
+   }
+}
+</pre>
+<p>You can pass one or more Strings ("admin", "editor", "guest", etc.) to the setSessionGroups method. Its parameter is a varargs. Additionally you can also pass one or more Enumerations (Group.ADMIN, Group.EDITOR, Group.GUEST, etc.).</p>
+<p class="note">Authorizing an action for only certain groups:</p>
+<pre class="brush: java; highlight: [2,3]; noBR: true;">
+		action("/User", UserAction.class, "edit")
+			.authorize(Group.ADMIN, Group.MASTER)
+			.on(ACCESSDENIED, exception("Only admin and master can modify a user!"))
+			.on(ERROR, fwd("/jsp/user/edit.jsp"))
+			.on(SHOW, fwd("/jsp/user/edit.jsp"))
+			.on(UPDATED, fwd("/jsp/index.jsp"));
+</pre>
+<br/>
+<p class="commands"><b>NOTE:</b> Line 2 above is equivalent to .authorize("ADMIN", "MASTER")</p>
+<p>The authorization is actually implemented as a filter that will return the result ACCESSDENIED in case the authorization fails. For that result we configure and ExceptionConsequence, which as the name implies will throw an ActionException with the message given.</p>
+<p class="commands"><b>TIP:</b> Instead of throwing an exception, you can also configure the ACCESSDENIED result to redirect to a nice page explaining to the user that he is not authorized to access that action.</p>
+<p class="note">Authorizing a JSP page for only certain groups:</p>
+<pre class="brush: xml; highlight: [4]; noBR: true;">
+&lt;%@ page contentType="text/html; charset=UTF-8"%&gt;
+&lt;%@taglib prefix="mtw" uri="http://www.mentaframework.org/tags-mtw/"%&gt;
+
+&lt;mtw:requiresAuthorization groups="ADMIN, MASTER" /&gt;
+</pre>
+<p class="commands"><b>NOTE:</b> Whatever consequence you configured for the ACCESSDENIED result in the application manager will happen here.</p>
+<p class="note">Authorizing only parts of a JSP page for only certain  groups:</p>
+<pre class="brush: xml; highlight: [4]; noBR: true;">
+&lt;%@ page contentType="text/html; charset=UTF-8"%&gt;
+&lt;%@taglib prefix="mtw" uri="http://www.mentaframework.org/tags-mtw/"%&gt;
+
+&lt;mtw:hasAuthorization groups="ADMIN, MASTER"&gt;
+Only authorized people can see this.
+&lt;/mtw:hasAuthorization&gt;
+</pre>
+<p class="commands"><b>TIP:</b> You can also use the attribute negate="true" in the above tag to invert the condition. All Mentawai conditional tags support this feature so you can easily implement something similar to an <i>else</i> statement.</p>
+</div>
+
+<div class="clear">
+<hr />
+</div>
+<br/><br/><br/>
+<div id="footer">
+<div><center>Copyright (c) 2011 - Powered by <a href="http://kawai.soliveirajr.com" target="_blank"><b>Kawai</b></a></center></div>
+<div class="clear">
+<hr />
+</div>
+</div>
+
+</body>
+</html>

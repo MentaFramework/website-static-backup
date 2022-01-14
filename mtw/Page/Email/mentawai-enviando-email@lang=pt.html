@@ -1,0 +1,1382 @@
+<!-- MWF Site -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+ 
+
+
+
+<html>
+<head>
+
+<title>Mentawai - Enviando Email</title>
+
+<style type="text/css" media="all">
+@import url("../../../Page.getCSS.mtw@file=main.css");
+</style>
+
+<meta http-equiv="imagetoolbar" content="no" />
+<meta http-equiv="imagetoolbar" content="false" />
+
+<link rel="shortcut icon" type="image/x-icon" href="../../../images/menta-ico.ico" />
+<link rel="icon" type="image/png" href="../../../images/menta-ico.png" />
+<link rel="stylesheet" href="../../../Page.getPrintCSS.mtw@file=print.css" type="text/css" media="print" />
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="author" content="Sergio Oliveira Junior" />
+<meta name="email" content="sergio.oliveira.jr@gmail.com" />
+
+<link href="../../../css/jquery-ui-1.8.16.custom.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="../../../jquery/jquery-1.6.4.min.js"></script>
+<script src="../../../js/jquery-ui-1.8.16.custom.min.js"></script>
+
+<link href="../../../uploadify/uploadify.css" type="text/css" rel="stylesheet" />
+<script type="text/javascript" src="../../../uploadify/swfobject.js"></script>
+<script type="text/javascript" src="../../../uploadify/jquery.uploadify.v2.1.4.min.js"></script>
+
+<!-- Include required JS files -->
+<script type="text/javascript" src="../../../sh/js/shCore.js"></script>
+ 
+<!--
+    At least one brush, here we choose JS. You need to include a brush for every 
+    language you want to highlight
+-->
+<script type="text/javascript" src="../../../sh/js/shBrushJava.js"></script>
+<script type="text/javascript" src="../../../sh/js/shBrushXml.js"></script>
+<script type="text/javascript" src="../../../sh/js/shBrushRuby.js"></script>
+ 
+<!-- Include *at least* the core style and default theme -->
+<link href="../../../sh/css/shCore.css" rel="stylesheet" type="text/css" />
+<link href="../../../sh/css/shThemeDefault.css" rel="stylesheet" type="text/css" />
+ 
+<!-- Finally, to actually run the highlighter, you need to include this JS on your page -->
+<script type="text/javascript">
+     SyntaxHighlighter.all();
+</script>
+
+<!--  User JavaScript -->
+<script type="text/javascript">
+
+function myJavaScriptFunction {
+
+   // put something here!!!!
+
+}
+
+
+</script>
+
+
+<script language="JavaScript">
+    
+        $(document).ready(function() {
+        
+        	
+
+            
+			
+			
+
+            
+
+			$('#loginDialog').keyup(function(e) {
+    			if (e.keyCode == 13) {
+        			$('#loginForm').submit();
+    			}
+			});
+			
+			$('#file_upload').uploadify({
+				'uploader'  : '/uploadify/uploadify.swf',
+				'script'    : '/File.upload.mtw;jsessionid=46FD5748476EB0CC5AD98EFF3AE50BE7',
+				'cancelImg' : '/uploadify/cancel.png',
+				'folder'    : '/uploads',
+				'scriptData': { 'JSESSIONID': '46FD5748476EB0CC5AD98EFF3AE50BE7'},
+				'auto'      : true,
+				'multi'     : true,
+				'onComplete'  : function(event, ID, fileObj, response, data) {
+
+					var resp = eval('(' + response + ')');
+		
+					if (resp.status == 'success') {
+						$('#uploadResults').append('<tr><td style="color: blue;">' + resp.msg + '</td></tr>');
+					} else if (resp.status == 'error') {
+						$('#uploadResults').append('<tr><td style="color: red;">' + resp.msg + '</td></tr>');    				
+					}
+				}
+			});
+
+            // ajax add new user:
+
+	        
+            $('#usernameLoading').hide();
+    
+            $('#addNewUserUsername').blur( function() {
+    
+                $('#usernameMessage').hide();
+    
+                if ($('#addNewUserUsername').val().trim() != '') {
+
+                    $('#usernameLoading').show();
+    
+                    $.post("/User.check.mtw", {
+                        username : $('#addNewUserUsername').val()
+                    }, function(response) {
+                        $('#usernameMessage').fadeOut();
+                        setTimeout("usernameResult('"
+                                + escape(response) + "')", 400);
+                    });
+                }
+    
+                return false;
+            });
+
+        });
+        
+        function prepareEditPageDialog(myDialog, theTitle) {
+
+            options = {
+                autoOpen: false,
+                width: 1000,
+                modal: true,
+                title: theTitle,
+                buttons: [
+                          {
+                                text: "Save",
+                                click: function() { $('#editPageForm').submit(); }
+                          },
+                          {
+                                text: "Preview",
+                                click: function() { $('#editPagePreview').val('true'); $('#editPageForm').submit(); }
+                          },                          
+                          {
+                                text: "Cancel",
+                                click: function() { $(this).dialog("close"); }
+                          }
+                      ]
+           };
+
+          myDialog.dialog(options);
+
+          return myDialog;
+        }
+
+        function prepareShowPageDialog(myDialog, theTitle) {
+
+            options = {
+                autoOpen: false,
+                width: 800,
+                modal: true,
+                title: theTitle,
+                buttons: [
+                          {
+                                text: "Back",
+                                click: function() { $(this).dialog("close"); }
+                          },
+                          {
+                                text: "Close",
+                                click: function() { $(this).dialog("close"); $('#listLastRevisionsDialog').dialog('close'); $('#listRevisionsDialog').dialog('close'); $('#listAllPagesDialog').dialog('close'); }
+                          }
+                      ]
+           };
+
+          myDialog.dialog(options);
+
+          return myDialog;
+        }
+        
+		function prepareFileListDialog(myDialog) {
+
+            options = {
+                autoOpen: false,
+                width: 400,
+                height: 300,
+                modal: true,
+                title: "Files uploaded:",
+                buttons: [
+                          {
+                                text: "Close",
+                                click: function() { $(this).dialog("close"); }
+                          }
+                      ]
+           };
+
+          myDialog.dialog(options);
+
+          return myDialog;
+        }        
+                
+
+        function prepareListAllPagesDialog(myDialog, showEdit) {
+
+            listAllPagesButtons = [
+                      {
+                            text: "Close",
+                            click: function() { $(this).dialog("close"); }
+                      }];
+
+            if (showEdit) {
+                listAllPagesButtons = [
+                          {
+                                text: "FrontPage",
+                                click: function() { $('#listAllPagesForm').attr('action', '/Page.setFrontPage.mtw'); $('#listAllPagesForm').submit(); }
+                          },
+                          {
+                                text: "Delete",
+                                click: function() { $('#listAllPagesForm').attr('action', '/Page.delete.mtw'); $('#listAllPagesForm').submit(); }
+                          },
+                          {
+                                text: "Close",
+                                click: function() { $(this).dialog("close"); }
+                          }];
+            }
+
+            options = {
+                autoOpen: false,
+                width: 800,
+                height: 450,
+                modal: true,
+                title: 'Pages:',
+                buttons: listAllPagesButtons
+           };
+
+          myDialog.dialog(options);
+
+          return myDialog;
+        }
+
+        function prepareListRevisionsDialog(myDialog, name, lang, showBackButton) {
+        
+        	theButtons = [
+                          {
+                                text: "Back",
+                                click: function() { $(this).dialog("close"); }
+                          },
+                          {
+                                text: "Close",
+                                click: function() { $(this).dialog("close"); $('#listAllPagesDialog').dialog('close'); }
+                          }
+                      ];
+                      
+			if (!showBackButton) {
+			
+        	theButtons = [
+                          {
+                                text: "Close",
+                                click: function() { $(this).dialog("close"); $('#listAllPagesDialog').dialog('close'); }
+                          }
+                      ];
+			}                      
+            
+
+            options = {
+                autoOpen: false,
+                width: 800,
+                height: 450,
+                modal: true,
+                title: 'Revisions for ' + name + ' in ' + lang,
+                buttons: theButtons
+           };
+
+          myDialog.dialog(options);
+
+          return myDialog;
+        }
+        
+        function prepareListLastRevisionsDialog(myDialog, language) {
+        
+        	theButtons = [
+                          {
+                                text: "Close",
+                                click: function() { $(this).dialog("close"); }
+                          }
+                      ];
+
+            options = {
+                autoOpen: false,
+                width: 800,
+                height: 450,
+                modal: true,
+                title: 'Latest revisions in ' + language,
+                buttons: theButtons
+           };
+
+          myDialog.dialog(options);
+
+          return myDialog;
+        }
+        
+        
+        function prepareFileUploadDialog(myDialog) {
+        
+            options = {
+                autoOpen: false,
+                width: 400,
+                height: 300,
+                modal: true,
+                title: 'Uploading files...',
+                buttons: [
+                          {
+                                text: "Close",
+                                click: function() { $(this).dialog("close"); }
+                          }
+                      ]
+           };
+
+          myDialog.dialog(options);
+
+          return myDialog;
+        }        
+        
+        function showEditPageDialog(pageName, lang) {
+
+            $.getJSON('/Page.get.mtw?name=' + pageName + '&lang=' + lang, function(data) {
+
+                if (data.page.systemPage) {
+                	$('.editPageTitleCell').hide();
+                } else {
+                	$('.editPageTitleCell').show();
+                	$('#editPageTitle').val(data.page.title);
+                }
+                
+                if (data.page.new) {
+                	$('#editPageCommentCell').hide();
+                } else {
+                	$('#editPageCommentCell').show();
+                	if (data.page.preview) {
+                		$('#editPageComment').val(data.page.comment);
+                	}
+                }
+                
+                $('#editPageTextArea').val(data.page.body);
+                $('#editPageName').val(data.page.name);
+                $('#editPageLang').val(data.page.lang);
+
+                myDialog = $('#editPageDialog');
+                myDialog = prepareEditPageDialog(myDialog, 'Editing <i><font color="darkblue">' + pageName + "</font></i> in <i>" + data.page.language.name + "<i>...");
+                myDialog.dialog('open');
+            });
+            
+            return false;
+        }
+        
+        function showFileListDialog() {
+
+            $.getJSON('/File.listFiles.mtw', function(data) {
+
+				$('#fileListTable').html('');
+            
+            	if (data.files.length == 0) {
+            		$('#fileListTable').html('<tr><td align="center">No files uploaded yet!</td></tr>');
+            	} else {
+            		$.each(data.files, function(i,file) {
+						$('#fileListTable').append('<tr><td>' + file + '</td></tr>');						            			
+            		});
+            	}
+
+                myDialog = $('#fileListDialog');
+                myDialog = prepareFileListDialog(myDialog);
+                myDialog.dialog('open');
+            });
+            
+            return false;
+        }        
+
+        function showShowPageDialog(pageName, lang, revision) {
+
+            $.getJSON('/Page.get.mtw?name=' + pageName + '&lang=' + lang + '&revision=' + revision, function(data) {
+            
+                if (data.page.systemPage) {
+                    $('.showPageTitleCell').hide();
+                } else {
+                    $('.showPageTitleCell').show();
+                    $('#showPageTitle').val(data.page.title);
+                }
+                $('#showPageTextArea').val(data.page.body);
+
+                theTitle = 'Showing <i><font color="darkblue">' + pageName + "</font></i> in <i>" + data.page.language.name + "<i>...";
+                if (revision > 0) {
+                    theTitle += ' (Revision #' + revision + ')';
+                }
+
+                myDialog = $('#showPageDialog');
+                myDialog = prepareShowPageDialog(myDialog, theTitle);
+                myDialog.dialog('open');
+            });
+            
+            return false;
+        }
+
+        
+        function showEditPreviewDialog(pageName, lang) {
+
+            $.getJSON('/Page.getPreview.mtw?name=' + pageName + '&lang=' + lang, function(data) {
+
+            	if (data.page.systemPage) {
+                	$('.editPageTitleCell').hide();
+                } else {
+                	$('.editPageTitleCell').show();
+                	$('#editPageTitle').val(data.page.title);
+                }
+                
+                if (data.page.new) {
+                	$('#editPageCommentCell').hide();
+                } else {
+                	$('#editPageCommentCell').show();
+                	if (data.page.preview) {
+                		$('#editPageComment').val(data.page.comment);
+                	}
+                }
+                
+                
+                $('#editPageTextArea').val(data.page.body);
+                $('#editPageName').val(data.page.name);
+                $('#editPageLang').val(data.page.lang);
+
+                myDialog = $('#editPageDialog');
+                myDialog = prepareEditPageDialog(myDialog, 'Editing <i><font color="darkblue">' + pageName + "</font></i> in <i>" + data.page.language.name + "<i>...");
+                myDialog.dialog('open');
+            });
+            
+            return false;
+        }
+        
+        
+       	function showEditPreviewNewPageDialog(pageName, lang) {
+
+            $.getJSON('/Page.getPreview.mtw?name=' + pageName + '&lang=' + lang, function(data) {
+            
+           		$('#createNewPageName').val(data.page.name);
+        		$('#createNewPageTitle').val(data.page.title);
+        		$('#createNewPageLanguage').val(data.page.languageId);
+        		$('#createNewPageTextArea').val(data.page.body);
+        		$('#createNewPageNameError').text('');
+        		$('#createNewPageTitleError').text('');
+        		$('#createNewPageLanguageError').text('');
+        		$('#createNewPageBodyError').text('');
+            
+				showCreateNewPageDialog();
+
+				$('#createPageLanguageCell').hide();
+            });
+            
+            return false;
+        }
+        
+        function showListAllPagesDialog(isAdmin) {
+
+            $.getJSON('/Page.list.mtw', function(data) {
+
+                tableData = '';
+                tableData += '<tr>';
+                if (isAdmin) tableData += '<th>&nbsp;</th>';
+                tableData += '<th>Name</th>';
+                tableData += '<th>Language</th>';
+                tableData += '<th>Created By</th>';
+                tableData += '<th>Modified By</th>';
+                tableData += '<th>&nbsp;</th>';
+                tableData += '<th>&nbsp;</th>';
+                tableData += '<th>&nbsp;</th>';
+                tableData += '</tr>';
+
+                $.each(data.pages, function(i,page) {
+                
+                	pageName = page.name;
+
+                    modifiedBy = '';
+                    if (page.modifiedById > 0) {
+                        modifiedBy = page.modifiedBy.username;
+                    }
+
+                    if (page.systemPage == true) {
+                        pageName = '*' + pageName;
+                    }
+
+                    if (page.frontPage == true) {
+                        pageName = '[' + pageName + ']';
+                    }
+                    
+                    modifiedOnTitle = '';
+                    if (page.formattedModifiedOn != null) {
+                    	modifiedOnTitle = ' title="' + page.formattedModifiedOn + '"';
+                    }
+                    
+                    createdOnTitle = '';
+                    if (page.formattedCreatedOn != null) {
+                    	createdOnTitle = ' title="' + page.formattedCreatedOn + '"';
+                    }
+                    
+                    radioCell = '&nbsp;';
+                    viewCell = '&nbsp;';
+                    if (page.CSS == false && page.systemPage == false) {
+                    	viewCell = '<a title="View Page" tabindex="-1" href="http://mentaframework.org/Page.mtw?name='&#32;+&#32;page.name&#32;+&#32;'&amp;lang='&#32;+&#32;page.lang&#32;+&#32;'"><img src="../../../images/preview.png" border="0" /></a> ';
+                    	if (page.frontPage == false) {
+                    		radioCell = '<input tabindex="-1" type="radio" name="pageId" id="pageId" value="' + page.id + '" />';
+                    	}
+                    }
+
+                    viewRevisionsCell = '<a title="View Revisions" class="revisionLink" tabindex="-1" href="mentawai-enviando-email@lang=pt.html#" onclick="return showListRevisionsDialog(\'' + page.name + '\',\'' + page.lang + '\',\'' + page.language.name + '\', true);"><img src="../../../images/folder.png" height="24" height="20" border="0" /></a>';
+                    
+                    nameTitle = '';
+                    if (page.title != null && page.title != '') {
+                    	nameTitle = ' title="' + page.title + '"';
+                    }
+
+                    tableData += '<tr>';
+                    if (isAdmin) tableData += '<td>' + radioCell + '</td>';
+                    tableData += '<td' + nameTitle + '>' + pageName + '</td>';
+                    tableData += '<td align="center">' + page.language.name + '</td>';
+                    tableData += '<td align="center"' + createdOnTitle + '>' + page.createdBy.username + '</td>';
+                    tableData += '<td align="center"' + modifiedOnTitle + '>' + modifiedBy + '</td>';
+                    tableData += '<td align="center">' + viewCell + '</td>';
+                    tableData += '<td align="center"><a tabindex="-1" title="View Html" href="mentawai-enviando-email@lang=pt.html#" onclick="return showShowPageDialog(\'' + page.name + '\',\'' + page.lang + '\', -1);"><img src="../../../images/view.png" border="0" /></a></td>';
+                    tableData += '<td align="center">' + viewRevisionsCell + '</td>';
+                    tableData += '</tr>';
+                });
+
+                $('#listAllPagesTable').html(tableData);
+
+                myDialogDiv = $('#listAllPagesDialog');
+                myDialog = prepareListAllPagesDialog(myDialogDiv, isAdmin);
+                myDialog.dialog('open');
+                $('.ui-dialog :button').blur();
+             });
+            
+            return false;
+        }
+
+        function showListRevisionsDialog(name, lang, language, showBackButton) {
+
+            $.getJSON('/Page.getRevisions.mtw?name=' + name + '&lang=' + lang, function(data) {
+
+                tableData = '';
+                tableData += '<tr>';
+                tableData += '<th>Revision</th>';
+                tableData += '<th>Author</th>';
+                tableData += '<th>Date</th>';
+                
+                if (data.isSystemPage == false) {
+                    tableData += '<th>&nbsp;</th>';
+                }
+                tableData += '<th>&nbsp;</th>';
+                tableData += '</tr>';
+
+                $.each(data.revisions, function(i,revision) {
+                
+                	titleForComment = '';
+                	if (revision.comment != null && revision.comment != '') {
+                		titleForComment = ' title="' + revision.comment + '"';
+                	}
+
+                    tableData += '<tr>';
+                    tableData += '<td' + titleForComment + '>' + revision.revision + '</td>';
+                    tableData += '<td align="center">' + revision.user.username + '</td>';
+                    tableData += '<td align="center">' + revision.formattedCreatedOn + '</td>';
+
+                    if (data.isSystemPage == false) {
+                        tableData += '<td align="center"><a title="View Page" tabindex="-1" href="../../../Page.mtw@name='&#32;+&#32;revision.name&#32;+&#32;'&amp;lang='&#32;+&#32;revision.lang&#32;+&#32;'&amp;revision='&#32;+&#32;revision.revision&#32;+'.html"><img src="../../../images/preview.png" border="0" /></a></td>';
+                    }
+                    
+                    tableData += '<td align="center"><a tabindex="-1" title="View Html" href="mentawai-enviando-email@lang=pt.html#" onclick="return showShowPageDialog(\'' + revision.name + '\',\'' + revision.lang + '\',' + revision.revision + ');"><img src="../../../images/view.png" border="0" /></a></td>';
+
+                    tableData += '</tr>';
+                });
+
+                $('#listRevisionsTable').html(tableData);
+                myDialog = $('#listRevisionsDialog');
+                myDialog = prepareListRevisionsDialog(myDialog, name, language, showBackButton);
+                myDialog.dialog('open');
+                $('.ui-dialog :button').blur();
+             });
+            
+            return false;
+        }
+        
+        function showListLastRevisionsDialog(lang, language, isLogged) {
+
+            $.getJSON('/Page.getLastRevisions.mtw?lang=' + lang, function(data) {
+
+                tableData = '';
+                tableData += '<tr>';
+                tableData += '<th>Page</th>';
+                tableData += '<th>Revision</th>';
+                tableData += '<th>Author</th>';
+                tableData += '<th>Date</th>';
+                tableData += '<th>Comment</th>';
+                tableData += '<th>&nbsp;</th>';
+
+                if (isLogged) {
+                    tableData += '<th>&nbsp;</th>';
+                }
+                
+                tableData += '</tr>';
+
+                $.each(data.revisions, function(i,revision) {
+                
+                    tableData += '<tr>';
+                    
+                    pageName = revision.name;
+                    
+                    if (revision.frontPage) {
+                    	pageName = '[' + pageName + ']';
+                    } else if (revision.systemPage) {
+                    	pageName = '*' + pageName;
+                    }
+
+                    nameTitle = '';
+                    if (revision.title != null && revision.title != '') {
+                    	nameTitle = ' title="' + revision.title + '"';
+                    }
+                    
+                    tableData += '<td' + nameTitle + ' align="center">' + pageName + '</td>';
+                    tableData += '<td align="center">' + revision.revision + '</td>';
+                    tableData += '<td align="center">' + revision.user.username + '</td>';
+                    tableData += '<td align="center">' + revision.formattedCreatedOn + '</td>';
+                    tableData += '<td align="left">' + revision.comment + '</td>';
+
+					if (!revision.systemPage) {
+                    	tableData += '<td align="center"><a title="View Page" tabindex="-1" href="../../../Page.mtw@name='&#32;+&#32;revision.name&#32;+&#32;'&amp;lang='&#32;+&#32;revision.lang&#32;+&#32;'&amp;revision='&#32;+&#32;revision.revision&#32;+'.html"><img src="../../../images/preview.png" border="0" /></a></td>';
+                    } else {
+                    	tableData += '<td>&nbsp;</td>';
+                    }
+
+                    if (isLogged) {
+                        tableData += '<td align="center"><a tabindex="-1" title="View Html" href="mentawai-enviando-email@lang=pt.html#" onclick="return showShowPageDialog(\'' + revision.name + '\',\'' + revision.lang + '\',' + revision.revision + ');"><img src="../../../images/view.png" border="0" /></a></td>';
+                    }
+                    
+                    tableData += '</tr>';
+                });
+
+                $('#listLastRevisionsTable').html(tableData);
+                myDialog = $('#listLastRevisionsDialog');
+                myDialog = prepareListLastRevisionsDialog(myDialog, language);
+                myDialog.dialog('open');
+                $('.ui-dialog :button').blur();
+             });
+            
+            return false;
+        }
+
+
+       	function showCreateNewPageDialog() {
+
+            $('#createNewPageFormName').val('Email');
+            $('#createNewPageFormLang').val('pt');
+            $('#createPageLanguageCell').show();
+
+            myDialog = $('#createNewPageDialog');
+            myDialog = prepareCreateNewPageDialog(myDialog);
+            myDialog.dialog('open');
+            
+            return false;
+        }
+        
+        function prepareCreateNewPageDialog(myDialog) {
+
+            options = {
+            	close: function() { clearCreateNewPageForm(); },
+                autoOpen: false,
+                width: 800,
+                modal: true,
+                title: "Create New Page:",
+                buttons: [
+                          {
+                                text: "Create",
+                                click: function() { $('#createNewPageForm').submit(); }
+                          },
+                          {
+                              text: "Preview",
+                              click: function() { $('#createNewPageFormPreview').val('true'); $('#createNewPageForm').submit(); }
+                          },
+                          {
+                                text: "Cancel",
+                                click: function() {  $(this).dialog("close"); }
+                          }
+                      ]
+           };
+
+          myDialog.dialog(options);
+
+          return myDialog;
+        }
+        
+        function showFileUploadDialog() {
+  			
+  			$('#uploadResults').html('');
+        
+        	myDialog = $('#fileUploadDialog');
+        	myDialog = prepareFileUploadDialog(myDialog);
+        	myDialog.dialog('open');
+        }
+        
+    
+        function showLoginDialog() {
+
+            $('#loginFormName').val('Email');
+            $('#loginFormLang').val('pt');
+
+            myDialog = $('#loginDialog');
+            myDialog = prepareLoginDialog(myDialog);
+            myDialog.dialog('open');
+
+            return false;
+        }
+
+        function showAddNewUserDialog(hideUsernameMessage) {
+
+            myDialog = $('#addNewUserDialog');
+            myDialog = prepareAddNewUserDialog(myDialog, hideUsernameMessage);
+            myDialog.dialog('open');
+
+            return false;
+        }
+        
+        function clearLoginForm() {
+        	$('#loginUsername').val('');
+        	$('#loginPassword').val('');
+        	$('#loginUsernameError').text('');
+        	$('#loginPasswordError').text('');
+        }
+
+        function clearAddNewUserForm() {
+        	$('#addNewUserUsername').val('');
+        	$('#addNewUserPassword').val('');
+        	$('#addNewUserPassconf').val('');
+        	$('#addNewUserGroup').val('');
+        	$('#usernameMessage').text('');
+        	$('#addNewUserPasswordError').text('');
+        	$('#addNewUserPassconfError').text('');
+        	$('#addNewUserGroupError').text('');
+        }
+        
+        function clearCreateNewPageForm() {
+        	$('#createNewPageName').val('');
+        	$('#createNewPageTitle').val('');
+        	$('#createNewPageLanguage').val('');
+        	$('#createNewPageTextArea').val('');
+        	$('#createNewPageNameError').text('');
+        	$('#createNewPageTitleError').text('');
+        	$('#createNewPageLanguageError').text('');
+        	$('#createNewPageBodyError').text('');
+        }
+        
+      	function prepareLoginDialog(myDialog) {
+
+            options = {
+            	close: function() { clearLoginForm(); },
+                autoOpen: false,
+                width: 290,
+                modal: true,
+                title: "Login:",
+                buttons: [
+                          {
+                                text: "Login",
+                                click: function() { $('#loginForm').submit(); }
+                          },
+                          {
+                                text: "Cancel",
+                                click: function() {  $(this).dialog("close"); }
+                          }
+                      ]
+           };
+
+          myDialog.dialog(options);
+
+          return myDialog;
+        }
+
+        function prepareAddNewUserDialog(myDialog, hideUsernameMessage) {
+
+        	$('#usernameLoading').hide();
+            if (hideUsernameMessage) $('#usernameMessage').text('');
+
+            options = {
+                close: function() { clearAddNewUserForm(); },
+                autoOpen: false,
+                width: 550,
+                modal: true,
+                title: "Add New User:",
+                buttons: [
+                          {
+                                text: "Add",
+                                click: function() { $('#addNewUserForm').submit(); }
+                          },
+                          {
+                                text: "Cancel",
+                                click: function() {  $(this).dialog("close"); }
+                          }
+                      ]
+           };
+
+          myDialog.dialog(options);
+
+          return myDialog;
+        }
+        
+      	function prepareConfirmDialog(myDialog) {
+
+            options = {
+                autoOpen: false,
+                width: 300,
+                modal: true,
+                title: "Confirmation:",
+                buttons: [
+                          {
+                                text: "Yes",
+                                click: function() { $(this).dialog("close"); }
+                          },
+                          {
+                                text: "No",
+                                click: function() {  $(this).dialog("close"); }
+                          }
+                      ]
+           };
+
+          myDialog.dialog(options);
+
+          return myDialog;
+        }
+        
+         function showConfirmDialog() {
+
+            myDialog = $('#confirmDialog');
+            myDialog = prepareConfirmDialog(myDialog);
+            myDialog.dialog('open');
+
+            return false;
+        }
+        
+        function usernameResult(response) {
+        
+                $('#usernameLoading').hide();
+        
+                var res = unescape(response);
+        
+                if (res == "error") {
+        
+                    $('#usernameMessage')
+                            .html(
+                                    '<font color="red"><b>Error!</b></font>');
+                    $('#usernameMessage').fadeIn();
+        
+                } else if (res == "success") {
+        
+                    $('#usernameMessage').html(
+                            '<img src="../../../images/chk.gif" />');
+                    $('#usernameMessage').fadeIn();
+        
+                } else if (res == "already") {
+        
+                    $('#usernameMessage')
+                            .html(
+                                    '<font color="red"><b>Username already exists!</b></font>');
+                    $('#usernameMessage').fadeIn();
+                }
+            }
+        </script>
+       	 	<!-- Google Analytics --> 
+		
+
+
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-3487700-4");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
+
+
+
+       
+
+</head>
+
+<body class="composite">
+
+<!--  For adding username -->
+<div id="addNewUserDialog" style="display: none;">
+        <form action="http://mentaframework.org/User.add.mtw" method="post" id="addNewUserForm">
+            <table>
+                <tr>
+                    <td width="10%">
+                        Username:
+                    </td>
+                    <td>
+                        <input type="text" name="username" size="20" maxlength="30" id="addNewUserUsername" />
+                        <span id="usernameLoading">
+                            <img src="../../../images/loading.gif" />
+                        </span>
+                        <span id="usernameMessage">
+                            
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Password:
+                    </td>
+                    <td>
+                        <input type="password" name="password" size="20" maxlength="20" id="addNewUserPassword" /> 
+                        <span id="addNewUserPasswordError">
+                            
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Confirm:
+                    </td>
+                    <td>
+                        <input type="password" name="passconf" size="20" maxlength="20" id="addNewUserPassconf" /> 
+                        <span id="addNewUserPassconfError">
+                            
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Group:
+                    </td>
+                    <td>
+                        <select name="groupId" id="addNewUserGroup">
+<option value=""> - </option>
+<option value="1">Admin</option>
+<option value="2">Editor</option>
+</select>
+
+                        <span id="addNewUserGroupError">
+                        
+                        </span>
+                    </td>
+                </tr>
+            </table>
+        </form>
+</div>
+
+<!-- For Testing -->
+<div id="dialog" title="Dialog Title" style="display: none;">I'm in a dialog</div>
+
+<!-- Close Confirm -->
+<div id="confirmDialog" style="display: none;">
+	<span id="confirmMessage">The confirmation message goes here.</span>
+</div>
+
+<!-- For file upload -->
+<div id="fileUploadDialog" style="display: none;">
+<br/>
+<input id="file_upload" name="file_upload" type="file" />
+<table cellspacing="2" cellpadding="5" id="uploadResults" style="margin-top: 10px;">
+</table>
+</div>
+
+<!-- For files listing -->
+<div id="fileListDialog" style="display: none;">
+<table cellspacing="2" cellpadding="5" id="fileListTable" style="margin-top: 10px;">
+</table>
+</div>
+
+<!-- For Editing Pages -->
+<div id="editPageDialog" style="display: none;">
+<form id="editPageForm" action="http://mentaframework.org/Page.edit.mtw" method="post">
+<input type="hidden" name="name" id ="editPageName" value="" />
+<input type="hidden" name="lang" id="editPageLang" value="" />
+<input type="hidden" name="isPreview" id="editPagePreview" value="false" />
+<table border="0">
+    <tr>
+        <td>&nbsp;</td>
+    </tr>
+                <tr class="editPageTitleCell">
+                    <td>
+                        Title:&nbsp;&nbsp;&nbsp;&nbsp;
+                        <input type="text" name="title" size="40" maxlength="100" id="editPageTitle" value="mentawai-enviando-email" />
+                        <span id="editPageTitleError">
+                        
+                        </span>
+                    </td>
+                </tr>
+                <tr class="editPageTitleCell"><td colspan="2">&nbsp;</td></tr>
+    <tr>
+        <td><textarea name="body" style="width: 100%; height: 465px;" id="editPageTextArea"></textarea>
+        <span id="editPageTextAreaError">
+                        
+                        </span>
+        
+        </td>
+    </tr>
+    
+    <tr id="editPageCommentCell">
+                    <td width="20%">
+                        Edit comment: (<i>optional</i>) &nbsp;&nbsp;&nbsp;&nbsp;
+                        <input type="text" name="comment" size="40" maxlength="100" id="editPageComment" />
+                        <span id="editPageCommentError">
+                        
+                        </span>
+                    </td>
+                </tr>
+    
+</table>
+</form>
+</div>
+
+<!-- For Showing Page Html -->
+<div id="showPageDialog" style="display: none;">
+<form id="showPageForm">
+<table>
+    <tr>
+        <td>&nbsp;</td>
+    </tr>
+                <tr class="showPageTitleCell">
+                    <td>
+                        Title:
+                    </td>
+                    <td>
+                        <input type="text" name="title" size="40" maxlength="100" id="showPageTitle" value="mentawai-enviando-email" readonly="readonly" />
+                    </td>
+                </tr>
+                <tr class="showPageTitleCell"><td>&nbsp;</td></tr>
+    <tr>
+        <td colspan="2">
+        <textarea name="body" style="width: 100%; height: 465px;" id="showPageTextArea" readonly="readonly"></textarea>
+        </td>
+    </tr>
+</table>
+</form>
+</div>
+
+
+<!-- For Login -->
+<div id="loginDialog" style="display: none;">
+		<form action="http://mentaframework.org/Login.mtw" method="post" id="loginForm">
+            <input type="hidden" name="name" value="" id="loginFormName" />
+            <input type="hidden" name="lang" value="" id="loginFormLang" />
+			<table>
+				<tr>
+					<td>
+						Username:
+					</td>
+					<td>
+						<input type="text" name="username" size="20" maxlength="20" id="loginUsername" />
+						<span id="loginUsernameError">
+						
+						</span>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Password:
+					</td>
+					<td>
+						<input type="password" name="password" size="20" maxlength="20" id="loginPassword" />
+						<span id="loginPasswordError"> 
+						
+						</span>
+					</td>
+				</tr>
+			</table>
+		</form>
+</div>
+
+<!-- For displaying all pages -->
+<div id="listAllPagesDialog" style="display: none;">
+    <form action="mentawai-enviando-email@lang=pt.html#" method="post" id="listAllPagesForm">
+    <table id="listAllPagesTable">
+    </table>
+    </form>
+</div>
+
+
+<!-- For displaying revisions -->
+<div id="listRevisionsDialog" style="display: none;">
+    <table class="revisionsTable" id="listRevisionsTable">
+    </table>
+</div>
+
+<!-- For displaying last revisions -->
+<div id="listLastRevisionsDialog" style="display: none;">
+    <table class="revisionsTable" id="listLastRevisionsTable">
+    </table>
+</div>
+
+
+<!-- Create New Page -->
+<div id="createNewPageDialog" style="display: none;">
+		<form action="http://mentaframework.org/Page.add.mtw" method="post" id="createNewPageForm">
+            <input type="hidden" name="name" value="" id="createNewPageFormName" />
+            <input type="hidden" name="lang" value="" id="createNewPageFormLang" />
+            <input type="hidden" name="isPreview" value="false" id="createNewPageFormPreview" />
+			<table>
+				<tr>
+					<td>
+						Name:
+					</td>
+					<td>
+						<input type="text" name="newPage.name" size="40" maxlength="30" id="createNewPageName" />
+						<span id="createNewPageNameError">
+						
+						</span>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Title:
+					</td>
+					<td>
+						<input type="text" name="newPage.title" size="40" maxlength="100" id="createNewPageTitle" />
+						<span id="createNewPageTitleError">
+						
+						</span>
+					</td>
+				</tr>
+				<tr id="createPageLanguageCell">
+					<td>
+						Language:
+					</td>
+					<td>
+						<select name="newPage.languageId" id="createNewPageLanguage">
+<option value=""> - </option>
+<option value="1">English</option>
+<option value="2">Portuguese</option>
+</select>
+
+						<span id="createNewPageLanguageError">
+						
+						</span>
+					</td>
+				</tr>
+				<tr>
+        			<td colspan="2">
+        				<textarea name="newPage.body" style="width: 100%; height: 465px;" id="createNewPageTextArea"></textarea>
+        				<span id="createNewPageBodyError">
+						
+						</span>
+        			</td>
+    			</tr>
+			</table>
+		</form>
+</div>
+
+
+<div>
+<table border="0">
+    <tr>
+        <td>
+
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../index.html"><img src="../../../uploads/images/mentawai-logo-new.png" border="0" /></a>        
+        
+        
+        </td>
+        <td align="right" valign="bottom">
+            
+                <!-- a href="#" onclick="return showListLastRevisionsDialog('pt', 'Portuguese', false);">Last Updates</a> | -->
+                <a href="mentawai-enviando-email@lang=pt.html#" onclick="return showLoginDialog();">Login</a>
+            
+            
+            &nbsp;
+            
+            <a href="mentawai-enviando-email@lang=en.html"><img src="../../../uploads/images/flag_usa.gif" border="0" width="20" height="13" style="border: 3px solid #fff; " /></a>
+<a href="mentawai-enviando-email@lang=pt.html"><img src="../../../uploads/images/flag_brazil.gif" border="0" width="20" height="13" style="border: 3px solid #ccc; " /></a>
+
+            &nbsp;&nbsp;&nbsp;
+        </td>
+    </tr>
+</table>
+</div>
+
+<hr />
+
+<div id="leftColumn">
+<div id="navcolumn">
+    <div>
+    <h3>Informações Gerais</h3>
+<ul>
+<li><a href="../Intro.html" class="large">Introdução</a></li>
+<li><a href="../QuickStart.html" class="large">Quick Start</a></li>
+<li><a href="../Downloads.html" class="large">Downloads</a></li>
+<!-- li><a href="http://mentawai-forum.soliveirajr.com/forums/show/21.page" target="_blank" class="large">Fórum de Discussão</a></li -->
+<li><a href="../../../api/index.html" target="_blank" class="large">Documentação da API</a></li>
+<li><a href="http://forum.mentaframework.org/posts/list/45/157.page" target="_blank" class="large">Casos de Sucesso</a></li>
+<li><a href="../Donations.html" class="large">Doações</a></li>
+</ul>
+
+<h3>Básico</h3>
+<ul>
+<li><a href="../Architecture.html" class="large">Arquitetura</a></li>
+<li><a href="../InOut.html" class="large">Action Input e Output</a></li>
+<li><a href="../Contexts.html" class="large">Action Contexts</a></li>
+<li><a href="../Consequences.html" class="large">Action Consequences</a></li>
+<li><a href="../Filters.html" class="large">Filtros</a></li>
+</ul>
+
+<h3>Funcionalidades</h3>
+<ul>
+<li><a href="../Properties.html" class="large">Propriedades por Ambiente</a></li>
+<li><a href="../Authentication.html" class="large">Autenticação</a></li>
+<li><a href="../Authorization.html" class="large">Autorização</a></li>
+<li><a href="../Validation.html" class="large">Validação</a></li>
+<li><a href="../DynamicMessages.html" class="large">Mensagens Dinâmicas</a></li>
+<li><a href="../IoC.html" class="large">Inversão de Controle</a></li>
+<li><a href="../I18N.html" class="large">Internacionalização</a></li>
+<li><a href="../DataLists.html" class="large">Lista de Dados</a></li>
+<li><a href="../MentaTags.html" class="large">Menta Tags</a></li>
+<li><a href="../CustomTags.html" class="large">Custom Tags</a></li>
+<li><a href="../DB.html" class="large">Conexão com o DB</a></li>
+<li><a href="../ORM.html" class="large">ORM e SQL builder</a></li>
+<li><span class="largeClicked">Enviando Email</span></li>
+<li><a href="../FileUpload.html" class="large">Upload de Arquivos</a></li>
+<li><a href="../Ajax.html" class="large">Ajax</a></li>
+<li><a href="../PrettyURL.html" class="large">Pretty URLs</a></li>
+</ul>
+
+<h3>Extra</h3>
+<ul>
+<li><a href="../RefApp.html" class="large">Aplicação de Referência</a></li>
+<li><a href="../DebugMode.html" class="large">Debug Mode</a></li>
+<li><a href="../Velocity.html" class="large">Integração com o Velocity</a></li>
+<li><a href="../JRuby.html" class="large">Integração com o JRuby</a></li>
+<li><a href="../Sticky.html" class="large">Stateful Actions</a></li>
+<li><a href="../PojoActions.html" class="large">Pojo Actions</a></li>
+<li><a href="../PaginatorTag.html" class="large">Tag de Paginação</a></li>
+<li><a href="../Hibernate.html" class="large">Hibernate Integration</a></li>
+<li><a href="../JRebel.html" class="large">Jetty + JRebel + Maven</a></li>
+</ul>
+
+<h3>Links</h3>
+<ul>
+<li><a href="http://old.mentaframework.org" target="_blank" class="large">Site Antigo</a></li>
+<li><a href="http://forum.mentaframework.org" target="_blank" class="large">Forum Antigo</a></li>
+<li><a href="http://mentabean.soliveirajr.com" target="_blank" class="large">MentaBean</a></li>
+<li><a href="http://mentacontainer.soliveirajr.com" target="_blank" class="large">MentaContainer</a></li>
+<li><a href="http://kawai.soliveirajr.com" target="_blank" class="large">Kawai Wiki</a></li>
+</ul>
+
+<h3>About</h3>
+<ul>
+<li><a href="../Subversion.html" class="large">Código Fonte</a></li>
+<li><a href="../Team.html" class="large">Equipe do Projeto</a></li>
+<li><a href="../Maven.html" class="large">Maven</a></li>
+<li><a href="http://www.gnu.org/copyleft/lesser.html" target="_blank" class="large">License (LGPL)</a></li>
+</ul>
+    </div>
+<br />
+</div>
+
+</div>
+
+<div id="bodyColumn">
+    
+    <h3>Enviando Email</h3>
+<ul>
+<p>O Mentawai possibilita o envio de mensagens de email de uma maneira extremamente simples. O framework oferece funcionalidades como templates, envio assíncrono e internacionalização de mensagens.</p>
+<p class="note">Configurando no application manager:</p>
+<pre class="brush: java; noBR: true;">
+	@Override
+	public void init(Context application) {
+		
+		Props props = getProps();
+		
+		if (!props.getBoolean("email.send_email")) {
+			
+			Email.setSendEmail(false); // nenhum email vai ser enviado... bom para testar a aplicacao sem enviar email
+			
+		} else {
+		
+			Email.setDefaultHostName(props.getString("email.host")); // o host de SMTP
+
+			Email.setDefaultPort( props.getInt("email.port") ); // a porta SMTP
+			
+			Email.setDefaultSslConnection( props.getBoolean("email.ssl") ); // precisa de SSL como o gmail?
+			
+			if (props.getBoolean("email.use_authentication")) { // precisa de autenticação?
+				
+				Email.setDefaultAuthentication(props.getString("email.user"), props.getString("email.pass")); 
+			}
+			
+			// para que vc não precise especificar o fromEmail e o toEmail toda hora
+                        // (mas você pode alterar esses valores padrões na hora do envio se quiser)
+			Email.setDefaultFrom(props.getString("email.from_email"), props.getString("email.from_name"));
+		}
+	}
+</pre>
+<p class="note">Exemplo de configuração no arquivo properties para Gmail:</p>
+<pre class="brush: xml; noBR: true;">
+# Email setup
+email.send_email = true
+email.host = smtp.gmail.com
+email.ssl = true
+email.port = 465
+email.use_authentication = true
+email.user = my.gmail.username@gmail.com
+email.pass = abc123
+email.from_email = my.gmail.username@gmail.com
+email.from_name = The Web Site Name Here
+</pre>
+<p class="note">Enviando uma mensagem:</p>
+<pre class="brush: java; noBR: true;">
+
+// espere até que a mensagem seja enviada: (envio síncrono)
+SimpleEmail.sendNow("Sergio Oliveira Jr.", "sergio@sergio.com", "Email test from Mentawai!", "Hi there,\n\nThis is a test!\n\nBye!\n");
+
+// retorne imediatemente e faça o envio numa thread no background (vc vai ter que assumir que o envio não vai falhar e caso falhe não será um problema para a aplicação)
+SimpleEmail.sendLater("Sergio Oliveira Jr.", "sergio@sergio.com", "Email test from Mentawai!", "Hi there,\n\nThis is a test!\n\nBye!\n");
+
+// versão html síncrona
+HtmlEmail.sendNow("Sergio Oliveira Jr.", "sergio@sergio.com", "Email test from Mentawai!", "&lt;p&gt;Hi there,\n\nThis is a &lt;b&gt;test&lt;/b&gt;!\n\nBye!\n&lt;/p&gt;");
+
+// versão html assíncrona
+HtmlEmail.sendLater("Sergio Oliveira Jr.", "sergio@sergio.com", "Email test from Mentawai!", "&lt;p&gt;Hi there,\n\nThis is a &lt;b&gt;test&lt;/b&gt;!\n\nBye!\n&lt;/p&gt;");
+</pre>
+<p class="note">Usando templates:</p>
+<pre class="brush: java; noBR: true;">
+			User user = getSessionObj();			
+
+			Letter welcome = new TextLetter("welcome.txt"); // &lt;=== esse arquivo também pode ser um template HTML (welcome.html)
+			welcome.setAttribute("username", u.getUsername());
+			welcome.setAttribute("password", u.getPassword());
+			
+			try {
+			
+				String subject = welcome.getSubject(getSessionLocale()); // &lt;=== precisa to locale para escolher a lingua certa
+				String body = welcome.getText(getSessionLocale()); // &lt;=== precisa do locale para escolher a lingua certa
+			
+				SimpleEmail.sendLater(u.getUsername(), u.getEmail(), subject, body); // &lt;=== vc tb pode usar o HtmlEmail para enviar um email HTML aqui
+				
+			} catch(Exception e) {
+				
+				System.err.println("Error sending email to: " + u.getEmail());
+				
+				e.printStackTrace();
+			}
+</pre>
+<p class="note">O arquivo com o template:</p>
+<p>O arquivo com o template fica dentro da pasta letters/<i>locale</i> no diretório raiz da sua aplicação web. Por exemplo, o arquivo letters/en_US/welcome.txt poderia conter:</p>
+<pre class="brush: xml; noBR: true;">
+Welcome to Menta Web App
+
+Thanks for registering. Your information is below:
+
+Username: $username
+Password: $password
+
+Best regards,
+
+Menta Web App
+</pre>
+<p class="commands"><b>NOTA:</b> A primeira linha do template é o título do email que você também pode internacionalizar.</p>
+</ul>
+
+</div>
+
+<div class="clear">
+<hr />
+</div>
+<br/><br/><br/>
+<div id="footer">
+<div><center>Copyright (c) 2011 - Powered by <a href="http://kawai.soliveirajr.com" target="_blank"><b>Kawai</b></a></center></div>
+<div class="clear">
+<hr />
+</div>
+</div>
+
+</body>
+</html>
