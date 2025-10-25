@@ -1,0 +1,55 @@
+{
+  "name": "mentawai",
+  "description": "Mentawai framework documentation and guides",
+  "base_url": "http://localhost:8383/mtw/Page",
+  "selectors": {
+    "main_content": "div[id=bodyColumn]",
+    "title": "title",
+    "code_blocks": "pre"
+  },
+  "url_patterns": {
+    "include": ["/mtw/Page/"],
+    "exclude": []
+  },
+  "categories": {
+    "basic": [
+      "Intro.html",
+      "Architecture.html",
+      "InOut.html",
+      "Contexts.html",
+      "Consequences.html",
+      "Filters.html"
+    ],
+    "features": [
+      "Properties.html",
+      "Authentication.html",
+      "Authorization.html",
+      "Validation.html",
+      "DynamicMessages.html",
+      "IoC.html",
+      "I18N.html",
+      "DataLists.html",
+      "MentaTags.html",
+      "CustomTags.html",
+      "DB.html",
+      "ORM.html",
+      "Email.html",
+      "FileUpload.html",
+      "Ajax.html",
+      "PrettyURL.html"
+    ],
+    "extra": [
+      "RefApp.html",
+      "DebugMode.html",
+      "Velocity.html",
+      "JRuby.html",
+      "Sticky.html",
+      "PojoActions.html",
+      "PaginatorTag.html",
+      "Hibernate.html",
+      "JRebel.html"
+    ]
+},
+  "rate_limit": 0.5,
+  "max_pages": 100
+}
